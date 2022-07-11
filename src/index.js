@@ -17,19 +17,25 @@ const document = (metadata, generateContentsCallback) => {
   self.showContents = true;
   self.filesForTOC = [];
   self.coverImage = '';
+  self.coverHtml = '';
 
   // Basic validation.
-  const required = ['id', 'title', 'author', 'cover'];
+  const required = ['id', 'title', 'author'];
   if (metadata == null) throw new Error('Missing metadata');
   required.forEach((field) => {
     const prop = metadata[field];
     if (prop == null || typeof (prop) === 'undefined' || prop.toString().trim() === '') throw new Error(`Missing metadata: ${field}`);
-    if (field === 'cover') {
-      self.coverImage = prop;
-    }
   });
   if (metadata.showContents !== null && typeof (metadata.showContents) !== 'undefined') {
     self.showContents = metadata.showContents;
+  }
+
+  if (metadata.cover !== null && typeof (metadata.cover) !== 'undefined') {
+    self.coverImage = metadata.cover;
+  }
+
+  if (metadata.coverHtml !== null && typeof (metadata.coverHtml) !== 'undefined') {
+    self.coverHtml = metadata.coverHtml;
   }
 
   // Add a new section entry (usually a chapter) with the given title and
@@ -80,9 +86,11 @@ const document = (metadata, generateContentsCallback) => {
     syncFiles.push({
       name: 'navigation.ncx', folder: 'OEBPF', compress: true, content: structuralFiles.getNCX(self),
     });
-    syncFiles.push({
-      name: 'cover.xhtml', folder: 'OEBPF', compress: true, content: markupFiles.getCover(self),
-    });
+    if (self.coverImage !== '' || self.coverHtml !== '') {
+      syncFiles.push({
+        name: 'cover.xhtml', folder: 'OEBPF', compress: true, content: markupFiles.getCover(self),
+      });
+    }
 
     // Optional files.
     syncFiles.push({
@@ -103,10 +111,13 @@ const document = (metadata, generateContentsCallback) => {
     }
 
     // Extra images - add filename into content property and prepare for async handling.
-    const coverFilename = path.basename(self.coverImage);
-    asyncFiles.push({
-      name: coverFilename, folder: 'OEBPF/images', compress: true, content: self.coverImage,
-    });
+    if (self.coverImage) {
+      const coverFilename = path.basename(self.coverImage);
+      asyncFiles.push({
+        name: coverFilename, folder: 'OEBPF/images', compress: true, content: self.coverImage,
+      });
+    }
+
     if (self.metadata.images) {
       self.metadata.images.forEach((image) => {
         const imageFilename = path.basename(image);
@@ -152,7 +163,7 @@ const document = (metadata, generateContentsCallback) => {
     // Start creating the zip.
     await util.makeFolder(folder);
     const output = fs.createWriteStream(`${folder}/${filename}.epub`);
-    const archive = zip('zip', { store: false });
+    const archive = zip('zip', {store: false});
     archive.on('error', (archiveErr) => {
       throw archiveErr;
     });
@@ -165,9 +176,9 @@ const document = (metadata, generateContentsCallback) => {
       // Write the file contents.
       files.forEach((file) => {
         if (file.folder.length > 0) {
-          archive.append(file.content, { name: `${file.folder}/${file.name}`, store: !file.compress });
+          archive.append(file.content, {name: `${file.folder}/${file.name}`, store: !file.compress});
         } else {
-          archive.append(file.content, { name: file.name, store: !file.compress });
+          archive.append(file.content, {name: file.name, store: !file.compress});
         }
       });
 

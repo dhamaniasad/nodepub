@@ -4,7 +4,7 @@ const nodepub = require('../src/index.js');
 // Metadata example.
 const metadata = {
   id: '278-123456789',
-  cover: 'test/test-cover.png',
+  // cover: 'test/test-cover.png',
   title: 'Unnamed Document',
   series: 'My Series',
   sequence: 1,

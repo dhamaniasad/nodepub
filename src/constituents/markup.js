@@ -23,7 +23,7 @@ const markup = {
       for (let i = 1; i <= document.sections.length; i += 1) {
         const section = document.sections[i - 1];
         if (!section.excludeFromContents) {
-          const { title } = section;
+          const {title} = section;
           result += `      <a href='s${i}.xhtml'>${title}</a><br/>[[EOL]]`;
         }
       }
@@ -48,7 +48,13 @@ const markup = {
 
   // Provide the contents of the cover HTML enclosure.
   getCover: (document) => {
-    const coverFilename = path.basename(document.coverImage);
+    let coverFilename;
+    let coverHtml;
+    if (document.coverImage) {
+      coverFilename = path.basename(document.coverImage);
+    } else if (document.coverHtml) {
+      coverHtml = document.coverHtml;
+    }
     let result = '';
     result += "<?xml version='1.0' encoding='UTF-8' ?>[[EOL]]";
     result += "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN'  'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>[[EOL]]";
@@ -62,7 +68,11 @@ const markup = {
     result += '  </style>[[EOL]]';
     result += '</head>[[EOL]]';
     result += '<body>[[EOL]]';
-    result += `  <div class='cover'><img style='height: 100%;width: 100%;' src='images/${coverFilename}' alt='Cover' /></div>[[EOL]]`;
+    if (coverFilename) {
+      result += `  <div class='cover'><img style='height: 100%;width: 100%;' src='images/${coverFilename}' alt='Cover' /></div>[[EOL]]`;
+    } else if (coverHtml) {
+      result += `  <div class='cover'>${coverHtml}</div>[[EOL]]`;
+    }
     result += '</body>[[EOL]]';
     result += '</html>[[EOL]]';
 
@@ -75,8 +85,8 @@ const markup = {
   // Provide the contents of a single section's HTML.
   getSection: (document, sectionNumber) => {
     const section = document.sections[sectionNumber - 1];
-    const { title } = section;
-    const { content } = section;
+    const {title} = section;
+    const {content} = section;
 
     let result = '';
     result += "<?xml version='1.0' encoding='utf-8'?>[[EOL]]";
