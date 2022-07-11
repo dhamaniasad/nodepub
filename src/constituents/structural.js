@@ -66,11 +66,25 @@ const structural = {
       result += "    <meta name='calibre:series_index' content='[[SEQUENCE]]'/>[[EOL]]";
     }
 
-    result += "    <meta name='cover' content='cover-image'/>[[EOL]]";
-    result += '  </metadata>[[EOL]]';
-    result += '  <manifest>[[EOL]]';
-    result += `    <item id='cover-image' media-type='${util.getImageType(coverFilename)}' href='images/${coverFilename}'/>[[EOL]]`;
-    result += "    <item id='cover' media-type='application/xhtml+xml' href='cover.xhtml'/>[[EOL]]";
+    if (document.coverImage) {
+      result += "    <meta name='cover' content='cover-image'/>[[EOL]]";
+      result += '  </metadata>[[EOL]]';
+      result += '  <manifest>[[EOL]]';
+      result += `    <item id='cover-image' media-type='${util.getImageType(coverFilename)}' href='images/${coverFilename}'/>[[EOL]]`;
+      result += "    <item id='cover' media-type='application/xhtml+xml' href='cover.xhtml'/>[[EOL]]";
+    }
+
+    if (!document.coverImage && document.coverHtml) {
+      result += '  </metadata>[[EOL]]';
+      result += '  <manifest>[[EOL]]';
+      result += "    <item id='cover' media-type='application/xhtml+xml' href='cover.xhtml'/>[[EOL]]";
+    }
+
+    if (!document.coverImage && !document.coverHtml) {
+      result += '  </metadata>[[EOL]]';
+      result += '  <manifest>[[EOL]]';
+    }
+
     result += "    <item id='navigation' media-type='application/x-dtbncx+xml' href='navigation.ncx'/>[[EOL]]";
 
     for (i = 1; i <= document.sections.length; i += 1) {
@@ -97,7 +111,9 @@ const structural = {
     result += '  </manifest>[[EOL]]';
 
     result += "  <spine toc='navigation'>[[EOL]]";
-    result += "    <itemref idref='cover' linear='yes' />[[EOL]]";
+    if (document.coverImage || document.coverHtml) {
+      result += "    <itemref idref='cover' linear='yes' />[[EOL]]";
+    }
 
     for (i = 1; i <= document.sections.length; i += 1) {
       if (document.sections[i - 1].isFrontMatter) {
@@ -146,10 +162,12 @@ const structural = {
     result += '<docTitle><text>[[TITLE]]</text></docTitle>[[EOL]]';
     result += '<docAuthor><text>[[AUTHOR]]</text></docAuthor>[[EOL]]';
     result += '<navMap>[[EOL]]';
-    result += `  <navPoint id='cover' playOrder='${playOrder++}'>[[EOL]]`;
-    result += '    <navLabel><text>Cover</text></navLabel>[[EOL]]';
-    result += "    <content src='cover.xhtml'/>[[EOL]]";
-    result += '  </navPoint>[[EOL]]';
+    if (document.coverImage || document.coverHtml) {
+      result += `  <navPoint id='cover' playOrder='${playOrder++}'>[[EOL]]`;
+      result += '    <navLabel><text>Cover</text></navLabel>[[EOL]]';
+      result += "    <content src='cover.xhtml'/>[[EOL]]";
+      result += '  </navPoint>[[EOL]]';
+    }
 
     for (i = 1; i <= document.sections.length; i += 1) {
       if (!(document.sections[i - 1].excludeFromContents)) {
@@ -157,7 +175,7 @@ const structural = {
           const fname = document.sections[i - 1].filename;
           title = document.sections[i - 1].title;
           order = playOrder++;
-          document.filesForTOC.push({ title, link: `${fname}`, itemType: 'front' });
+          document.filesForTOC.push({title, link: `${fname}`, itemType: 'front'});
           result += `  <navPoint class='section' id='s${i}' playOrder='${order}'>[[EOL]]`;
           result += `    <navLabel><text>${title}</text></navLabel>[[EOL]]`;
           result += `    <content src='content/${fname}'/>[[EOL]]`;
@@ -167,7 +185,7 @@ const structural = {
     }
 
     if (document.showContents) {
-      document.filesForTOC.push({ title: document.metadata.contents, link: 'toc.xhtml', itemType: 'contents' });
+      document.filesForTOC.push({title: document.metadata.contents, link: 'toc.xhtml', itemType: 'contents'});
       result += `  <navPoint class='toc' id='toc' playOrder='${playOrder++}'>[[EOL]]`;
       result += '    <navLabel><text>[[CONTENTS]]</text></navLabel>[[EOL]]';
       result += "    <content src='content/toc.xhtml'/>[[EOL]]";
@@ -180,7 +198,7 @@ const structural = {
           const fname = document.sections[i - 1].filename;
           title = document.sections[i - 1].title;
           order = playOrder++;
-          document.filesForTOC.push({ title, link: `${fname}`, itemType: 'main' });
+          document.filesForTOC.push({title, link: `${fname}`, itemType: 'main'});
           result += `  <navPoint class='section' id='s${i}' playOrder='${order}'>[[EOL]]`;
           result += `    <navLabel><text>${title}</text></navLabel>[[EOL]]`;
           result += `    <content src='content/${fname}'/>[[EOL]]`;

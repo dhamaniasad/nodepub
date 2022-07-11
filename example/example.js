@@ -5,7 +5,7 @@ const nodepub = require('../src/index.js');
 const metadata = {
   id: '278-123456789',
   // cover: 'test/test-cover.png',
-  coverHtml: '<div><h1>Cover</h1><h2>Subtitle</h2></div>',
+  // coverHtml: '<div><h1>Cover</h1><h2>Subtitle</h2></div>',
   title: 'Unnamed Document',
   series: 'My Series',
   sequence: 1,
