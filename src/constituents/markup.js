@@ -67,7 +67,7 @@ const markup = {
       result += '    .cover { margin: 0; padding: 0; font-size: 1px; }[[EOL]]';
     }
     if (coverHtml) {
-      result += '    .cover { margin: 0; padding: 0; margin-top: 60px; font-size: 32px; }[[EOL]]';
+      result += '    .cover { margin: 0; padding: 0; margin-top: 60px; font-size: 32px; text-align: center; }[[EOL]]';
     }
     result += '    img { margin: 0; padding: 0; height: 100%; }[[EOL]]';
     result += '  </style>[[EOL]]';
