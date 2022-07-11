@@ -63,9 +63,17 @@ const markup = {
     result += '  <title>[[TITLE]]</title>[[EOL]]';
     result += "  <style type='text/css'>[[EOL]]";
     result += '    body { margin: 0; padding: 0; text-align: center; }[[EOL]]';
-    result += '    .cover { margin: 0; padding: 0; font-size: 1px; }[[EOL]]';
+    if (coverFilename) {
+      result += '    .cover { margin: 0; padding: 0; font-size: 1px; }[[EOL]]';
+    }
+    if (coverHtml) {
+      result += '    .cover { margin: 0; padding: 0; margin-top: 60px; font-size: 32px; }[[EOL]]';
+    }
     result += '    img { margin: 0; padding: 0; height: 100%; }[[EOL]]';
     result += '  </style>[[EOL]]';
+    if (coverHtml) {
+      result += "    <link rel='stylesheet' type='text/css' href='./css/ebook.css' />[[EOL]]";
+    }
     result += '</head>[[EOL]]';
     result += '<body>[[EOL]]';
     if (coverFilename) {
